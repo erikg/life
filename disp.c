@@ -17,11 +17,11 @@ void disp_init(int width, int height) {
     renderer = SDL_CreateRenderer(win, -1, 0);
 }
 
-void disp_update(void *buf, int width, int height) {
+void disp_update(unsigned char *buf, int width, int height) {
     int x,y;
     for(y=0;y<height;y++) {
         for (x=0;x<width;x++) {
-            SDL_SetRenderDrawColor(renderer, life_val_at(x,y), 0, 48, SDL_ALPHA_OPAQUE);
+            SDL_SetRenderDrawColor(renderer, buf[y*width+x], 0, 48, SDL_ALPHA_OPAQUE);
             SDL_RenderDrawPoint(renderer, x, y);
         }
     }
