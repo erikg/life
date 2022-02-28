@@ -33,8 +33,6 @@ void life_load(unsigned char *buf, int width, int height, int off_x, int off_y);
  */
 void life_sim();
 
-int life_val_at(int x, int y);
-
 /* return a pointer to the current tile */
 void *life_buffer();
 #endif
