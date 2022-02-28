@@ -6,7 +6,7 @@
 #include "disp.h"
 
 #define WIDTH 512
-#define HEIGHT WIDTH
+#define HEIGHT 256
 
 void seed() {
 	static int zq;
@@ -17,7 +17,7 @@ void seed() {
 	for(j=0;j<256*256;j++) {
 		buf[j] = rand()&0x5;
 	}
-	life_load(buf, 64, 64, 32, 32);
+	life_load(buf, 64, 32, 32, 32);
 }
 
 int main(int argc, char **argv) {

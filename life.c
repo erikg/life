@@ -6,8 +6,8 @@
 unsigned char *tile[2];	// device
 unsigned char *local_tile;	// host
 unsigned char currBuffer = 0;	// device
-#define otherBuffer (1-currBuffer)	// bah
-int width, height;	// both?
+int width, height;	// device
+
 
 static unsigned char val_at(int x, int y) {
 	if(x<0 || y<0 || x>(width-1) || y>(width-1)) return 0;
@@ -46,7 +46,7 @@ void life_sim_row(int y) {
 		unsigned char live = val_at(x-1, y) + val_at(x+1, y) + val_at(x-1, y-1) + val_at(x, y-1) \
 							 + val_at(x+1, y-1) + val_at(x-1, y+1) + val_at(x, y+1) + val_at(x+1, y+1);
 		unsigned char newlife = val_at(x,y)?((live>>1)&1):live==3;
-		tile[otherBuffer][x+width*y] = newlife?255:0;
+		tile[1-currBuffer][x+width*y] = newlife?255:0;
 	}
 }
 
@@ -55,7 +55,7 @@ void life_sim() {
 	while(--y) {
 		life_sim_row(y);
 	}
-	currBuffer = otherBuffer;
+	currBuffer = 1-currBuffer;
 }
 
 void *life_buffer() {
