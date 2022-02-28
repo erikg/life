@@ -5,8 +5,8 @@
 #include "life.h"
 #include "disp.h"
 
-#define WIDTH 512
-#define HEIGHT 256
+#define WIDTH 768
+#define HEIGHT 512
 
 void seed() {
 	static int zq;
