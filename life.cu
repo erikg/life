@@ -1,22 +1,32 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <life.h>
 
-#undef CUDA
+extern "C" {
 
-#define val_at(_x, _y) (((_x)<0 || (_y)<0 || (_x)>(width-1) || (_y)>(width-1)) ? 0 : tile[currBuffer][(_x)+width*(_y)] ? 1 : 0)
+#define HEIGHT 512
+
+#include "life.h"
+
+// #undef CUDA
+#define CUDA 1
+
 
 #ifdef CUDA
 __global__
+void life_sim_row(unsigned char *src, unsigned char *dst, int width) {
+	int y = blockIdx.x;
+#else
+void life_sim_row(unsigned char *src, unsigned char *dst, int width, int y) {
 #endif
-void life_sim_row(unsigned char **tile, int currBuffer, int width, int y) {
 	int x = width;
 	while(--x) {
+#define val_at(_x, _y) (((_x)<0 || (_y)<0 || (_x)>(width-1) || (_y)>(width-1)) ? 0 : src[(_x)+width*(_y)] ? 1 : 0)
 		unsigned char live = val_at(x-1, y) + val_at(x+1, y) + val_at(x-1, y-1) + val_at(x, y-1) \
 							 + val_at(x+1, y-1) + val_at(x-1, y+1) + val_at(x, y+1) + val_at(x+1, y+1);
 		unsigned char newlife = val_at(x,y)?((live>>1)&1):live==3;
-		tile[1-currBuffer][x+width*y] = newlife?255:0;
+#undef val_at
+		dst[x+width*y] = newlife?255:0;
 	}
 }
 
@@ -41,6 +51,8 @@ void life_init(int width_, int height_) {
 
 void life_deinit() {
 #ifdef CUDA
+	cudaFree(tile[0]);
+	cudaFree(tile[1]);
 #else
 	free(tile[0]);
 	free(tile[1]);
@@ -50,28 +62,24 @@ void life_deinit() {
 }
 
 void life_load(unsigned char *buf, int w, int h, int off_x, int off_y) {
-	int i,j;
+	int j;
 	for(j=0;j<h;j++) {
 #ifdef CUDA
-		cudaMemcpy(
-			buf+(j*w),
-			tile[currBuffer] + ((off_y+j)*width) + off_x,
-			w, cudaMemcpyHostToDevice);
+		cudaMemcpy(tile[currBuffer] + ((off_y+j)*width) + off_x, buf+(j*w), w, cudaMemcpyHostToDevice);
 #else
+		// cudaMemcpy(tile[currBuffer] + ((off_y+j)*width) + off_x, buf+(j*w), w, cudaMemcpyHostToHost);
 		memcpy(tile[currBuffer] + ((off_y+j)*width) + off_x, buf+(j*w), w);
 #endif
 	}
 }
 
 void life_sim() {
-	int y = height, sum=0;
 #ifdef CUDA
-	while(--y) {
-		life_sim_row<<<1,1>>>(tile, currBuffer, width, y);
-	}
+	life_sim_row<<<HEIGHT,1>>>(tile[currBuffer], tile[1-currBuffer], width);
 #else
+	int y = height;
 	while(--y) {
-		life_sim_row(tile, currBuffer, width, y);
+		life_sim_row(tile[currBuffer], tile[1-currBuffer], width, y);
 	}
 #endif
 	currBuffer = 1-currBuffer;
@@ -81,7 +89,10 @@ void *life_buffer() {
 #ifdef CUDA
 	cudaMemcpy(local_tile, tile[currBuffer], width*height, cudaMemcpyDeviceToHost);
 #else
+//	cudaMemcpy(local_tile, tile[currBuffer], width*height, cudaMemcpyHostToHost);
 	memcpy(local_tile, tile[currBuffer], width*height);
 #endif
 	return local_tile;
+}
+
 }

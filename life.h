@@ -35,4 +35,5 @@ void life_sim();
 
 /* return a pointer to the current tile */
 void *life_buffer();
+
 #endif
