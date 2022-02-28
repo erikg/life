@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
-project(life)
+project(life LANGUAGES CXX)
 find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 
-set(SRCS life.c main.c disp.c)
+set(SRCS life.cxx main.cxx disp.cxx)
 include_directories("${CMAKE_SOURCE_DIR}" "${SDL2_INCLUDE_DIRS}" "${OPENGL_INCLUDE_DIR}")
 link_libraries(${SDL2_LIBRARIES})
 link_libraries(${OPENGL_LIBRARIES})

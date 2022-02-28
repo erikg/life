@@ -20,8 +20,8 @@ int life_val_at(int x, int y) {
 void life_init(int width_, int height_) {
 	width = width_;
 	height = height_;
-  tile[0] = malloc(width * height);
-  tile[1] = malloc(width * height);
+  tile[0] = (unsigned char *)malloc(width * height);
+  tile[1] = (unsigned char *)malloc(width * height);
 }
 
 void life_deinit() {
@@ -38,9 +38,7 @@ void life_load(unsigned char *buf, int w, int h, int off_x, int off_y) {
   }
 }
 
-void life_sim() {
-  int y = height, sum=0;
-  while(--y) {
+void life_sim_row(int y) {
     int x = width;
     while(--x) {
       unsigned char live = val_at(x-1, y) + val_at(x+1, y) + val_at(x-1, y-1) + val_at(x, y-1) \
@@ -48,10 +46,16 @@ void life_sim() {
       unsigned char newlife = val_at(x,y)?((live>>1)&1):live==3;
       tile[otherBuffer][x+width*y] = newlife?255:0;
     }
+}
+
+void life_sim() {
+  int y = height, sum=0;
+  while(--y) {
+	  life_sim_row(y);
   }
   currBuffer = otherBuffer;
 }
 
 void *life_buffer() {
-  (void *)(tile+currBuffer);
+  return (void *)(tile+currBuffer);
 }
