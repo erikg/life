@@ -7,26 +7,27 @@
 #include "disp.h"
 #include "life.h"
 
-SDL_Window *win;
-SDL_Renderer *renderer;
+#define renderer ((SDL_Renderer *)(this->blob))
 
-void disp_init(int width, int height) {
+Display::Display(int width, int height) {
+    this->width = width;
+    this->height = height;
     SDL_Init(SDL_INIT_VIDEO);
-    win = SDL_CreateWindow("Life", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+    SDL_Window *win = SDL_CreateWindow("Life", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                            width, height, SDL_WINDOW_SHOWN);
-    renderer = SDL_CreateRenderer(win, -1, 0);
+    this->blob = (void *)SDL_CreateRenderer(win, -1, 0);
 }
 
-void disp_update(void *buf, int width, int height) {
-    for(int y=0;y<height;y++) {
-        for (int x=0;x<width;x++) {
-            SDL_SetRenderDrawColor(renderer, life_val_at(x,y), 0, 48, SDL_ALPHA_OPAQUE);
+void Display::update(void *buf, Life *l) {
+    for(int y=0;y<this->height;y++) {
+        for (int x=0;x<this->width;x++) {
+            SDL_SetRenderDrawColor(renderer, l->val_at(x,y), 0, 48, SDL_ALPHA_OPAQUE);
             SDL_RenderDrawPoint(renderer, x, y);
         }
     }
 }
 
-int disp_input() {
+int Display::input() {
     SDL_Event event;
     while(SDL_PollEvent(&event)) {
         if(event.type == SDL_QUIT || (event.type == SDL_KEYUP && event.key.keysym.scancode == SDLK_ESCAPE)) {
@@ -36,11 +37,11 @@ int disp_input() {
     return -1;
 }
 
-void disp_swap() {
+void Display::swap() {
     SDL_RenderPresent(renderer);
 }
 
-void disp_deinit() {
+Display::~Display() {
     SDL_Quit();
 }
 

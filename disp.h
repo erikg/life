@@ -1,10 +1,18 @@
 #ifndef _DISP_H_
 #define _DISP_H_
 
-void disp_init(int width, int height);
-void disp_update(void *buf, int width, int height);
-void disp_swap();
-int disp_input();
-void disp_deinit();
+#include "life.h"
+
+class Display {
+    public:
+        Display(int width, int height);
+        ~Display();
+        void update(void *buf, Life *l);
+        void swap();
+        int input();
+    private:
+        int width, height;
+        void *blob;
+};
 
 #endif

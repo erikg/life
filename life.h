@@ -1,12 +1,14 @@
 #ifndef _LIFE_H_
 #define _LIFE_H_
 
+class Life {
+    public:
 /* prepare the board. Memory consumption is width*height bits.
  * width - map width in pixels
  * height - map height in pixels 
  */
-void life_init(int width, int height);
-void life_deinit();
+Life(int width, int height);
+~Life();
 
 /* 
  * load contents of buffer with size into tile memory at offset.
@@ -25,16 +27,21 @@ void life_deinit();
  * off_x - offset X in pixels/bits
  * off_y - offset Y in pixels/bits
  */
-void life_load(unsigned char *buf, int width, int height, int off_x, int off_y);
+void load(unsigned char *buf, int width, int height, int off_x, int off_y);
 
 /*
  * execute one simulation step. 
  * returns number of live cells.
  */
-void life_sim();
+void sim();
 
-int life_val_at(int x, int y);
+int val_at(int x, int y);
 
 /* return a pointer to the current tile */
-void *life_buffer();
+void *buffer();
+
+private:
+int width, height;
+};
+
 #endif
