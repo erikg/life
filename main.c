@@ -25,7 +25,8 @@ int main(int argc, char **argv) {
 	disp_init(WIDTH, HEIGHT);
 	seed();
 	while(disp_input()) {
-		for(int i=0;i<10;i++)
+		int i;
+		for(i=0;i<100;i++)
 			life_sim();
 		disp_update(life_buffer(), WIDTH, HEIGHT);
 		disp_swap();
