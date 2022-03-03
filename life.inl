@@ -6,6 +6,7 @@ extern "C" {
 
 #define HEIGHT 512
 
+#include "cell.h"
 #include "life.h"
 
 #ifdef CUDA
@@ -17,8 +18,8 @@ void life_sim_row(cell_t *src, cell_t *dst, int width, int y) {
 #endif
 	int x;
 	for(x=1;x<width;x++) {
-#define val_at(_x, _y) (src[(1+_x)+(width)*(_y+1)])
-		cell_t live = 
+#define val_at(_x, _y) (src[(1+_x)+(width)*(_y+1)].val)
+		unsigned char live = 
 			val_at(x-1, y) 
 			+ val_at(x+1, y) 
 
@@ -30,29 +31,29 @@ void life_sim_row(cell_t *src, cell_t *dst, int width, int y) {
 			+ val_at(x, y+1) 
 			+ val_at(x+1, y+1);
 		if(live == 0) {
-			dst[1+x+(width)*(y+1)] = 0;
+			dst[1+x+(width)*(y+1)].val = 0;
 		} else if( (live&0xf) && !(live>>4) ) {
 			live &= 0xf;
-			dst[1+x+(width)*(y+1)] = (val_at(x,y)?(((live)>>1)&1):(live)==3) ? 0x1 : 0;
+			dst[1+x+(width)*(y+1)].val = (val_at(x,y)?(((live)>>1)&1):(live)==3) ? 0x1 : 0;
 		} else if( !(live&0xf) && (live>>4) ) {
 			live >>= 4;
-			dst[1+x+(width)*(y+1)] = (val_at(x,y)?((live>>1)&1):(live)==3) ? 0x10 : 0;
+			dst[1+x+(width)*(y+1)].val = (val_at(x,y)?((live>>1)&1):(live)==3) ? 0x10 : 0;
 		} else {
-			dst[1+x+(width)*(y+1)] = 0;
+			dst[1+x+(width)*(y+1)].val = 0;
 		}
 #undef val_at
 	}
-	dst[0] = dst[width+1] = 0;
+	dst[0].val = dst[width+1].val = 0;
 }
 
 cell_t *tile[2];	// device
 cell_t *local_tile;	// host
-cell_t currBuffer = 0;	// device
+unsigned int currBuffer = 0;	// device
 int width, height;	// device
 
 
 void life_init(int width_, int height_) {
-	int bytes = (width_ + 2) * (height_ + 2);
+	int bytes = (width_ + 2) * (height_ + 2) * sizeof(cell_t);
 	width = width_;
 	height = height_;
 #ifdef CUDA
@@ -62,7 +63,7 @@ void life_init(int width_, int height_) {
 	tile[0] = (cell_t *)malloc(bytes);
 	tile[1] = (cell_t *)malloc(bytes);
 #endif
-	local_tile = (cell_t *)malloc(width * height);
+	local_tile = (cell_t *)malloc(bytes);
 }
 
 void life_deinit() {
@@ -107,10 +108,10 @@ void life_sim() {
 
 cell_t *life_buffer() {
 #ifdef CUDA
-	cudaMemcpy(local_tile, tile[currBuffer], width*height, cudaMemcpyDeviceToHost);
+	cudaMemcpy(local_tile, tile[currBuffer], width*height*sizeof(cell_t), cudaMemcpyDeviceToHost);
 #else
 //	cudaMemcpy(local_tile, tile[currBuffer], width*height, cudaMemcpyHostToHost);
-	memcpy(local_tile, tile[currBuffer], width*height);
+	memcpy(local_tile, tile[currBuffer], width*height*sizeof(cell_t));
 #endif
 	return local_tile;
 }

@@ -4,6 +4,7 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 
+#include "cell.h"
 #include "life.h"
 #include "disp.h"
 
@@ -23,7 +24,7 @@ void disp_update(cell_t *buf, int width, int height) {
     int x,y;
     for(y=0;y<height;y++) {
         for (x=0;x<width;x++) {
-	    cell_t val = buf[(y+1)*width+x+1];
+	    unsigned int val = buf[(y+1)*width+x+1].val;
             SDL_SetRenderDrawColor(renderer, val&0xf?255:0, val&0xf0?255:0, 48, SDL_ALPHA_OPAQUE);
             SDL_RenderDrawPoint(renderer, x, y);
         }

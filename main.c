@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "cell.h"
 #include "life.h"
 #include "disp.h"
 
-#define WIDTH 384
-#define HEIGHT 256
+#define WIDTH 512
+#define HEIGHT WIDTH
 
-#define SEED_EDGE 32
+#define SEED_EDGE 16
 #define SEED_EDGE2 (SEED_EDGE*SEED_EDGE)
 
 void seed() {
@@ -18,14 +19,14 @@ void seed() {
 
 	srand(getpid());
 	for(j=0;j<SEED_EDGE2;j++) {
-		buf[j] = (rand()&0x5) ? 0x01 : 0;
+		buf[j].val = (rand()&0x5) ? 0x01 : 0;
 	}
-	life_load(buf, SEED_EDGE, SEED_EDGE, 64, 64);
+	life_load(buf, SEED_EDGE, SEED_EDGE, 2, 2);
 
 	for(j=0;j<SEED_EDGE2;j++) {
-		buf[j] = (rand()&0x5) ? 0x10 : 0;
+		buf[j].val = (rand()&0x5) ? 0x10 : 0;
 	}
-	life_load(buf, SEED_EDGE, SEED_EDGE, 280, 200);
+	life_load(buf, SEED_EDGE, SEED_EDGE, WIDTH-SEED_EDGE-2, HEIGHT-SEED_EDGE-2);
 }
 
 int main(int argc, char **argv) {
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
 	disp_swap();
 	while(disp_input()) {
 		int i;
-		for(i=0;i<5;i++)
+		for(i=0;i<100;i++)
 			life_sim();
 		disp_update(life_buffer(), WIDTH, HEIGHT);
 		disp_swap();
