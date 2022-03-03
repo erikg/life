@@ -4,24 +4,27 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 
-#include "disp.h"
 #include "life.h"
+#include "disp.h"
 
-SDL_Window *win;
-SDL_Renderer *renderer;
+SDL_Window *win = NULL;
+SDL_Renderer *renderer = NULL;
 
 void disp_init(int width, int height) {
+    renderer = NULL;
+    win = NULL;
     SDL_Init(SDL_INIT_VIDEO);
     win = SDL_CreateWindow("Life", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                           width, height, SDL_WINDOW_SHOWN);
+                           width+2, height+2, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(win, -1, 0);
 }
 
-void disp_update(unsigned char *buf, int width, int height) {
+void disp_update(cell_t *buf, int width, int height) {
     int x,y;
     for(y=0;y<height;y++) {
         for (x=0;x<width;x++) {
-            SDL_SetRenderDrawColor(renderer, buf[y*width+x], 0, 48, SDL_ALPHA_OPAQUE);
+	    cell_t val = buf[(y+1)*width+x+1];
+            SDL_SetRenderDrawColor(renderer, val&0xf?255:0, val&0xf0?255:0, 48, SDL_ALPHA_OPAQUE);
             SDL_RenderDrawPoint(renderer, x, y);
         }
     }

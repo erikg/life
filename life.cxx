@@ -1,2 +1,2 @@
-#define CUDA 1
+#undef CUDA
 #include "life.inl"
