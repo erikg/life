@@ -12,36 +12,35 @@ extern "C" {
 #ifdef CUDA
 __global__
 void life_sim_row(cell_t *src, cell_t *dst, int width) {
-	int y = blockIdx.x;
+	int y = blockIdx.y;
+	int x = blockIdx.x;
 #else
-void life_sim_row(cell_t *src, cell_t *dst, int width, int y) {
+void life_sim_row(cell_t *src, cell_t *dst, int width, int x, int y) {
 #endif
-	int x;
-	for(x=1;x<width;x++) {
+
+	unsigned char live = 
 #define val_at(_x, _y) (src[(1+_x)+(width)*(_y+1)].val)
-		unsigned char live = 
-			val_at(x-1, y) 
-			+ val_at(x+1, y) 
+		val_at(x-1, y) 
+		+ val_at(x+1, y) 
 
-			+ val_at(x-1, y-1) 
-			+ val_at(x, y-1)
-			+ val_at(x+1, y-1) 
+		+ val_at(x-1, y-1) 
+		+ val_at(x, y-1)
+		+ val_at(x+1, y-1) 
 
-			+ val_at(x-1, y+1) 
-			+ val_at(x, y+1) 
-			+ val_at(x+1, y+1);
-		if(live == 0) {
-			dst[1+x+(width)*(y+1)].val = 0;
-		} else if( (live&0xf) && !(live>>4) ) {
-			live &= 0xf;
-			dst[1+x+(width)*(y+1)].val = (val_at(x,y)?(((live)>>1)&1):(live)==3) ? 0x1 : 0;
-		} else if( !(live&0xf) && (live>>4) ) {
-			live >>= 4;
-			dst[1+x+(width)*(y+1)].val = (val_at(x,y)?((live>>1)&1):(live)==3) ? 0x10 : 0;
-		} else {
-			dst[1+x+(width)*(y+1)].val = 0;
-		}
+		+ val_at(x-1, y+1) 
+		+ val_at(x, y+1) 
+		+ val_at(x+1, y+1);
+	if(live == 0) {
+		dst[1+x+(width)*(y+1)].val = 0;
+	} else if( (live&0xf) && !(live>>4) ) {
+		live &= 0xf;
+		dst[1+x+(width)*(y+1)].val = (val_at(x,y)?(((live)>>1)&1):(live)==3) ? 0x1 : 0;
+	} else if( !(live&0xf) && (live>>4) ) {
+		live >>= 4;
+		dst[1+x+(width)*(y+1)].val = (val_at(x,y)?((live>>1)&1):(live)==3) ? 0x10 : 0;
 #undef val_at
+	} else {
+		dst[1+x+(width)*(y+1)].val = 0;
 	}
 	dst[0].val = dst[width+1].val = 0;
 }
@@ -93,11 +92,13 @@ void life_load(cell_t *buf, int w, int h, int off_x, int off_y) {
 void life_sim() {
 	memset(tile[1-currBuffer], 0, (width+1)*(height+1));
 #ifdef CUDA
-	life_sim_row<<<HEIGHT,1>>>(tile[currBuffer], tile[1-currBuffer], width);
+	life_sim_row<<<dim3(WIDTH,HEIGHT),1>>>(tile[currBuffer], tile[1-currBuffer], width);
 #else
-	int y = height;
+	int x, y;
 	for(y=1;y<(height+1);y++) {
-		life_sim_row(tile[currBuffer], tile[1-currBuffer], width, y);
+		for(x=1;x<(width+1);x++) {
+			life_sim_row(tile[currBuffer], tile[1-currBuffer], width, x, y);
+		}
 	}
 	memset(tile[currBuffer], 0, width);
 	memset(tile[currBuffer] + (width + 1) * height, 0, width);
