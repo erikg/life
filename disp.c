@@ -1,8 +1,4 @@
 #include <SDL.h>
-#include <SDL_opengl.h>
-
-#include <GL/gl.h>
-#include <GL/glext.h>
 
 #include "cell.h"
 #include "life.h"

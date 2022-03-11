@@ -4,8 +4,6 @@
 
 extern "C" {
 
-#define HEIGHT 512
-
 #include "cell.h"
 #include "life.h"
 
@@ -90,7 +88,6 @@ void life_load(cell_t *buf, int w, int h, int off_x, int off_y) {
 }
 
 void life_sim() {
-	memset(tile[1-currBuffer], 0, (width+1)*(height+1));
 #ifdef CUDA
 	life_sim_row<<<dim3(WIDTH,HEIGHT),1>>>(tile[currBuffer], tile[1-currBuffer], width);
 #else

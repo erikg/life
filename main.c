@@ -6,9 +6,6 @@
 #include "life.h"
 #include "disp.h"
 
-#define WIDTH 512
-#define HEIGHT WIDTH
-
 #define SEED_EDGE 16
 #define SEED_EDGE2 (SEED_EDGE*SEED_EDGE)
 

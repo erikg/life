@@ -1,6 +1,10 @@
 #ifndef _LIFE_H_
 #define _LIFE_H_
 
+#define WIDTH 512
+#define HEIGHT WIDTH
+
+
 /* prepare the board. Memory consumption is width*height bits.
  * width - map width in pixels
  * height - map height in pixels 
