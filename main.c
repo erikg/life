@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 	disp_swap();
 	while(disp_input()) {
 		int i;
-		for(i=0;i<100;i++)
+		for(i=0;i<10;i++)
 			life_sim();
 		disp_update(life_buffer(), WIDTH, HEIGHT);
 		disp_swap();
