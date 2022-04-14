@@ -7,11 +7,11 @@
 
 #ifdef CUDA
 __global__
-void life_sim_row(cell_t *src, cell_t *dst, int width) {
+void life_sim_cell(cell_t *src, cell_t *dst, int width) {
 	int y = blockIdx.y;
 	int x = blockIdx.x;
 #else
-void life_sim_row(cell_t *src, cell_t *dst, int width, int x, int y) {
+void life_sim_cell(cell_t *src, cell_t *dst, int width, int x, int y) {
 #endif
 
 	unsigned char live = 
@@ -38,7 +38,6 @@ void life_sim_row(cell_t *src, cell_t *dst, int width, int x, int y) {
 	} else {
 		dst[1+x+(width)*(y+1)].val = 0;
 	}
-	dst[0].val = dst[width+1].val = 0;
 }
 
 cell_t *tile[2];	// device

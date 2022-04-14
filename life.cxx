@@ -16,7 +16,7 @@ void life_sim() {
 	int x, y;
 	for(y=1;y<height;y++) {
 		for(x=1;x<width;x++) {
-			life_sim_row(tile[currBuffer], tile[1-currBuffer], width, x, y);
+			life_sim_cell(tile[currBuffer], tile[1-currBuffer], width, x, y);
 		}
 	}
 	memset(tile[currBuffer], 0, width);
