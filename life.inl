@@ -46,6 +46,7 @@ unsigned int currBuffer = 0;	// device
 int width, height;	// device
 
 
+/*
 void life_deinit() {
 #ifdef CUDA
 	cudaFree(tile[0]);
@@ -57,7 +58,9 @@ void life_deinit() {
 	tile[0] = tile[1] = 0;
 	width = height = 0;
 }
+*/
 
+/*
 void life_load(cell_t *buf, int w, int h, int off_x, int off_y) {
 	int j;
 	for(j=1;j<h;j++) {
@@ -69,7 +72,9 @@ void life_load(cell_t *buf, int w, int h, int off_x, int off_y) {
 #endif
 	}
 }
+*/
 
+/*
 cell_t *life_buffer() {
 #ifdef CUDA
 	cudaMemcpy(local_tile, tile[currBuffer], width*height*sizeof(cell_t), cudaMemcpyDeviceToHost);
@@ -79,3 +84,4 @@ cell_t *life_buffer() {
 #endif
 	return local_tile;
 }
+*/
