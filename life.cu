@@ -12,24 +12,16 @@ void life_init(int width_, int height_) {
 	local_tile = (cell_t *)malloc(bytes);
 }
 
-void life_sim() {
-	life_sim_cell<<<dim3(WIDTH,HEIGHT),1>>>(tile[currBuffer], tile[1-currBuffer], width);
-
-	/*
-	for(int i=0;i<height+2;i++) {
-		cell_t *dst = tile[currBuffer]+ (i * width * sizeof(cell_t));
-		dst[0].val = dst[width].val = 0;
-	}
-	*/
-	currBuffer = 1-currBuffer;
-}
-
-
 void life_deinit() {
 	cudaFree(tile[0]);
 	cudaFree(tile[1]);
 	tile[0] = tile[1] = 0;
 	width = height = 0;
+}
+
+void life_sim() {
+	life_sim_cell<<<dim3(WIDTH,HEIGHT),1>>>(tile[currBuffer], tile[1-currBuffer], width);
+	currBuffer = 1-currBuffer;
 }
 
 void life_load(cell_t *buf, int w, int h, int off_x, int off_y) {

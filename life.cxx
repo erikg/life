@@ -13,24 +13,11 @@ void life_init(int width_, int height_) {
 }
 
 void life_deinit() {
-#ifdef CUDA
-	cudaFree(tile[0]);
-	cudaFree(tile[1]);
-#else
 	free(tile[0]);
 	free(tile[1]);
-#endif
 	tile[0] = tile[1] = 0;
 	width = height = 0;
 }
-
-void life_load(cell_t *buf, int w, int h, int off_x, int off_y) {
-	int j;
-	for(j=1;j<h;j++) {
-		memcpy(tile[currBuffer] + ((off_y+j+1)*width) + off_x + 1, buf+(j*w), w);
-	}
-}
-
 
 void life_sim() {
 	int x, y;
@@ -43,6 +30,13 @@ void life_sim() {
 	memset(tile[currBuffer] + (width + 1) * height, 0, width);
 	memset(tile[currBuffer] + (width + 1) * (height-1), 0, width);
 	currBuffer = 1-currBuffer;
+}
+
+void life_load(cell_t *buf, int w, int h, int off_x, int off_y) {
+	int j;
+	for(j=1;j<h;j++) {
+		memcpy(tile[currBuffer] + ((off_y+j+1)*width) + off_x + 1, buf+(j*w), w);
+	}
 }
 
 
