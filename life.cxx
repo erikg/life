@@ -21,8 +21,8 @@ void life_deinit() {
 
 void life_sim() {
 	int x, y;
-	for(y=1;y<height;y++) {
-		for(x=1;x<width;x++) {
+	for(y=0;y<height-1;y++) {
+		for(x=0;x<width-1;x++) {
 			life_sim_cell(tile[currBuffer], tile[1-currBuffer], width, x, y);
 		}
 	}

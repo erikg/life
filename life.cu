@@ -20,7 +20,8 @@ void life_deinit() {
 }
 
 void life_sim() {
-	life_sim_cell<<<dim3(WIDTH,HEIGHT),1>>>(tile[currBuffer], tile[1-currBuffer], width);
+	life_sim_cell<<<dim3(WIDTH-2,HEIGHT-2),1>>>(tile[currBuffer], tile[1-currBuffer], width);
+	cudaMemset(tile[currBuffer], 0, (WIDTH+2)*(HEIGHT+2)*sizeof(cell_t));
 	currBuffer = 1-currBuffer;
 }
 
