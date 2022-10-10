@@ -9,7 +9,7 @@
 __global__
 void life_sim_cell(cell_t *src, cell_t *dst, int width) {
 	int y = blockIdx.y;
-	int x = blockIdx.x;
+	int x = blockIdx.x*blockDim.x + threadIdx.x;
 #else
 void life_sim_cell(cell_t *src, cell_t *dst, int width, int x, int y) {
 #endif
